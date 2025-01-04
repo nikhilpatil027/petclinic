@@ -1,6 +1,7 @@
 @Library('my-shared-library@main') _
+
 pipeline {
-    agent any
+    agent { label 'slave' }
 
     environment {
         JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
@@ -9,18 +10,59 @@ pipeline {
     }
 
     stages {
-        stage('pipeline') {
+        stage('Checkout Code') {
             steps {
-                pipeline()
+                checkoutCode()
+            }
+        }
+
+        stage('Set up Java 17') {
+            steps {
+                setupJava()
+            }
+        }
+
+        stage('Set up Maven') {
+            steps {
+                setupMaven()
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                buildProject()
+            }
+        }
+
+        stage('Upload Artifact') {
+            steps {
+                echo 'Uploading artifact...'
+                archiveArtifacts artifacts: 'target/petclinic-0.0.1-SNAPSHOT.jar', allowEmptyArchive: true
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                runApplication()
+            }
+        }
+
+        stage('Validate App is Running') {
+            steps {
+                validateApp()
+            }
+        }
+
+        stage('Gracefully Stop Spring Boot App') {
+            steps {
+                stopApplication()
             }
         }
     }
 
     post {
         always {
-            echo 'Cleaning up...'
-            // Any cleanup steps, like stopping the app or cleaning up the environment
-            sh 'pkill -f "mvn spring-boot:run" || true' // Ensure the app is stopped
+            cleanup()
         }
     }
 }
