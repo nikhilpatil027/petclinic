@@ -1,7 +1,12 @@
-@Library('my-shared-library@main') _
+
+@Library('my-shared-library@main') _  // Correct syntax
 
 pipeline {
-    agent { label 'slave' }
+    agent { label 'Node3' }
+    // triggers {
+    //     // Trigger at midnight every day
+    //     cron('*/2 * * * *')
+    // }
 
     environment {
         JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
@@ -11,58 +16,91 @@ pipeline {
 
     stages {
         stage('Checkout Code') {
-            steps {
-                checkoutCode()
+            steps { 
+                script {
+                   pipelineAll.checkoutCode()
+               }
             }
         }
 
         stage('Set up Java 17') {
             steps {
-                setupJava()
+                 script {
+                   pipelineAll.setupJava()
+                 }
             }
         }
 
         stage('Set up Maven') {
             steps {
-                setupMaven()
+                 script {
+                   pipelineAll.setupMaven()
+                 }
             }
         }
 
         stage('Build with Maven') {
             steps {
-                buildProject()
+                 script {
+                   pipelineAll.buildProject()
+                 }
             }
         }
-
+        // stage('Configure Git') {
+        //     steps {
+        //         script {
+        //             // Set global Git user.name and user.email
+        //             sh 'git config --global user.name "SanjanaKrishn"'
+        //             sh 'git config --global user.email "sanjanabn6@gmail.com"'
+        //         }
+        //     }
+        // }
+        // stage('Tag Build') {
+        //     steps {
+        //         script {
+        //             def buildTag = "build-${env.BUILD_NUMBER}"
+        //             tagBuild(buildTag, "Tagging build number ${env.BUILD_NUMBER}")
+        //         }
+        //     }
+        // }
         stage('Upload Artifact') {
             steps {
-                echo 'Uploading artifact...'
-                archiveArtifacts artifacts: 'target/petclinic-0.0.1-SNAPSHOT.jar', allowEmptyArchive: true
+                 script {
+                   pipelineAll.uploadArtifact('target/petclinic-0.0.1-SNAPSHOT.jar')
+                 }
             }
         }
 
         stage('Run Application') {
             steps {
-                runApplication()
+                 script {
+                   pipelineAll.runApplication()
+                 }
             }
         }
 
         stage('Validate App is Running') {
             steps {
-                validateApp()
+                 script {
+                   pipelineAll.validateApp()
+                 }
             }
         }
 
         stage('Gracefully Stop Spring Boot App') {
             steps {
-                stopApplication()
+                 script {
+                   pipelineAll.stopApplication()
+                 }
             }
         }
     }
 
     post {
         always {
-            cleanup()
+             script {
+                   pipelineAll.cleanup()
+             }
         }
     }
 }
