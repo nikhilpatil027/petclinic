@@ -6,10 +6,17 @@
 
     <groupId>com.example</groupId>
     <artifactId>petclinic</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>PetClinic</name>
     <description>Pet Clinic Application</description>
     <packaging>jar</packaging>
+    <distributionManagement>
+            <repository>
+                 <id>central</id>
+                 <name>a0prxbns7pcoi-artifactory-primary-0-releases</name>
+                 <url>https://trial1yes1e.jfrog.io/artifactory/pet_clinic-libs-release-local</url>
+            </repository>
+    </distributionManagement>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
